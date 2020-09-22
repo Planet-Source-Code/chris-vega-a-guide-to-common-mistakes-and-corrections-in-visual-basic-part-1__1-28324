@@ -1,0 +1,550 @@
+A Guide to Common Mistakes and Corrections in Visual Basic
+Part 1
+
+Written by: Chris Vega [gwapo@models.com]
+
+October 12, 2001, Philippines
+
+Introduction
+============================================================================
+
+Ok, you passed the area of writing a successful "Hello World, Watermellon"
+Visual Basic Application, and you are planning to move to a higher level,
+or still sticking to the current level you are working on, or you already
+wrote a great and advanced Application Prototype, and planning to relax
+while reviewing what you have writen, seeing if you can still optimized
+and improve the application while it is still reliable as ever.
+
+This article was written specially to improve your flow-control, what is
+the better if not the best way to make you application performs much better
+while still written in a read-coding-friendly way by guiding you on the
+most common mistakes in Visual Basic programmings.
+
+
+The Proper way of using Datas
+============================================================================
+
+I really wanted to start this article with a Naming Conventions and How to
+Properly Ident your Code to make it more readers friendly, but it is already
+a very common topic and there are already too many articles floating in
+details about them, so let me start only on how to manage your datas to
+increase your application's performance.
+
+1] Use "Option Explicit" Statement
+
+	There you go, you always forgot one of the most important thing in 
+	Visual Basic, always declare your variable before you use them and
+	dont let Visual Basic declare them for you. Why? because you are 
+	missing a big chance of controling a very basic flow of your 
+	Application, and an Undeclared variable always consumes higher memory
+	since Visual Basic "assumes" data storage to the maximum, so your
+	application can fit everything it needed to be stored on that variable.
+
+	ex.
+		MyName = "Chris Vega"
+
+		' If MyName is Undeclared, then it is considered a Variant
+		' type and needs to passed through type testing first and
+		' since i passed a String Data to it, it will automatically
+		' be declared *in-memory* as 255-characters variable, hmmm,
+		' since my name only consumes 10 characters, we have wasted
+		' 245 precious data space.
+
+	Using "Option Explicit" is not a must, but it will help you a lot when
+	declaring variables, and hoping you didn't forgoten the use of two
+	useful Menu Item on the Context Menu (when you right-click a statement
+	or a variable):
+
+	Definition	-	Position the cursor to the definition
+				of that Variable, Sub, Function or
+				Anything that can be defined.
+	Last Position	-	The name says so, returns the cursor
+				to the previous position.
+
+2] Always use 32-Bit Variable
+
+	How many times have you ever declared variable to use a smaller size
+	to fit a count for looping purpose, or left it undeclared (refer to #1)
+	once, twice or you lost your count.
+
+	I supposed you are asking me another why question, the answer is, All
+	Windows	Operating System (except 3.1, 3.11 and XP) are running in
+	32-bit mode, so the more you use the 32-bit Variable, makes your 
+	application executes faster,
+
+	ex.
+		' This is the common
+		Dim i As Integer
+		For i = 1 to 10000
+			DoEvents
+		Next
+
+		' But this is faster
+		Dim i As Long
+		For i = 1 to 10000
+			DoEvents
+		Next
+
+	Long is always faster than Integer, because if you use some debugging tools
+	like SoftIce to see the codes internally, you will be amazed that "i As Long"
+	will be used immediately, while "i As Integer" will be converted to Long in
+	memory before it becomes useful.
+
+	Note: If you use Variant for looping, Visual Basic will turn this variant to
+	      Long, ie:
+
+		Dim i
+		For i = 1 to 10000
+			DoEvents
+		Next
+
+		' Is the same as (in performance)
+		Dim i As Long
+		For i = 1 to 10000
+			DoEvents
+		Next
+
+	Offcouse, this also applies with Arrays, Next...
+
+3] Arrays, Dimensioning Properly
+
+	Arrays are normally defined as:
+
+		Dim MyArray(100) As Long
+
+	While programmers only using part of them, like, for example:
+
+		For i = 60 to 80
+			MyArray(i) = i
+		Next
+
+	If this is the case, and your application wont be using the
+	whole of the Array's Dimensions, declare them properly using the "To"
+	operand inside dimension declaration:
+
+		Dim MyArray(60 To 80) As Long
+
+	So, there is no waste array-element.
+
+4] Arrays, Undimensioned
+
+	When we come accross for some dynamic array usage, we certainly think
+	of undimensioned arrays, but unlike with those undefined variables,
+	Visual Basic stores Array Datas into a SAFE ARRAY memory location, therefore
+	undimensioned array is *NOT* defined to the maximum, it only defined as
+	no-element Array
+
+		Dim MyArray() As Long
+
+	contains no-element declared in memory, thats why we cannot use the 
+	undimensioned array just like this:
+
+		MyArray(0) = 100
+
+	will raise an error, since the array has no-element; you must create an valid
+	element to use them using the ReDim command:
+
+		ReDim MyArray(0) As Long
+		MyArray(0) = 100
+
+	becomes valid one, while using the "Preserve" command, will preserve the entire
+	Array contents while creating/removing elements on the array:
+
+		ReDim Preserve MyArray(1) As Long
+		MyArray(1) = 200
+
+	And since using undimensioned array take less or properly (dynamic) defined
+	elements, using this is highly recommended, specially when saving temporary
+	datas from a database.
+
+5] Strings
+
+	String is an array of characters, and just like what i discussed above as 
+	dimensioned array, strings must also be dimensioned properly, ie, set the
+	length to only the size of the strings we in need, ie:
+
+		Dim MyString As String
+
+	will be defined automatically as 255 characters long, while you are only using
+	part of it, so define it as:
+
+		Dim MyString As String * 10
+
+	the "* 10" give the string a dimension, ie, you cannot put data longer than 10
+	characters long on MyString or it will be stripped.
+
+		ex.
+
+		Dim MyString As String * 10
+		MyString = "Chris Vega Again!"
+
+		' MyString will only contain "Chris Vega", " Again" will be stripped,
+		' while,
+
+		MyString = "Chris"
+
+		' MyString will contain, "Chris     ", since the Variable is defined
+		' as FIXED 10 characters long.
+
+	Becasuse we contained the String to hold only 10 characters long, to make it
+	redefined to a longer String, you must re-call:
+
+		Dim MyString As String * 25
+
+	And theres no way you can call "ReDim" coz its not an actuall array.
+
+6] Micelleneous
+
+	For additional tips of improving your application performance:
+
+	- Always give appropriate datatypes to what does the variable is for:
+	- And follow proper naming conventions (optional):
+
+		Dim dtTodayIs As Date
+		Dim dtTimeIn As Date
+
+		Dim strMyName As String * 10
+		Dim strSpaceOf60CharsLong As String * 60
+
+		Dim dblTemperature As Double * 2
+
+	- In groupings of Variable, Use a User-Defined Types instead of Arrays
+
+		Type typTwoLongs
+			lngFirst As Long
+			lngSecond As Long
+		End Type
+
+		Dim lngMyLongs As typTwoLongs
+
+	- In Arrays, always use undimensioned arrays more than dimensioned ones
+
+		Dim aryNames() As String * 20
+		Dim i As Long, NameCounts As Long
+
+		NameCounts = 120
+
+		For i = 0 to NameCounts
+			ReDim Preserve aryNames(i) As String * 20
+			aryNames(i) = "Named" & i
+		Next
+
+	- Whenever you are done with Objects, clear its memory usage by setting
+	  it to Nothing.
+
+		Dim MyObject As Object
+		Set MyObject = CreateObject("Whatever.Watermelon")
+
+		.
+		.
+		' Using the Object
+		.
+		.
+		
+		Set MyObject = Nothing	' Clear it
+
+	- Make your variables RE-USABLE
+
+		This is the factors most developers left out, ie, i seen in
+		10 out of 100 programs that if they defined variable for
+		use only in loops, they will use that variable only for loops
+
+		ex.
+		
+		Dim i As Long, y As Long
+
+		For i = 1 to 1000
+			DoEvents
+		Next
+
+		y = 1000
+
+		' While "i" can be in place of "y = 1000"	
+
+		i = 1000
+
+		' Therefore, eliminates the declaration of "y As Long" above.
+
+	- Use Variant wisely
+
+		Same as the above, BUT, Variant variables are DYNAMIC in Data
+		Types, this can be legal:
+
+		Dim MyVariant
+
+		MyVariant = "I can contain Strings"
+		MyVariant = String(25, 45)
+		MyVariant = 1000			' Can also be Numbers
+		MyVariant = Now				' Can also be Date
+		Set MyVariant = CreateObject(...)	' How about that, its object
+		Set MyVariant = Nothing			' or even Nothing!
+
+
+A look inside Subroutine and Functions
+============================================================================
+
+Same as variable definitions, but all focused inside a procedure or functions,
+so before you get bored, let start it now
+
+1] Function Name as Variable
+
+	Inside a Function, use the Function Name itself rather than assigning a 
+	different Variable to handle temporary datas.
+
+	I always seen Functions defined just like this one:
+
+		Function GetSum(aryElements() As Long) As Long
+			Dim i As Long
+			Dim tmpSums As Long
+
+			tmpSums = 0
+
+			For i = LBound(aryElements) To UBound(aryElements)
+				tmpSums = tmpSums + aryElementsToSummed(i)
+			Next
+
+			GetSum = tmpSums
+		End Function
+
+	While the better and the right approach is:
+
+		Function GetSum(aryElements() As Long) As Long
+			Dim i As Long
+
+			For i = LBound(aryElements) To UBound(aryElements)
+				GetSum = GetSum + aryElementsToSummed(i)
+			Next
+		End Function
+
+	As you can see, it not only shrink the code, but also makes it faster
+	due to the fact that we didn't assigned our datas to temporary variables.
+
+
+2] The Optional Arguments
+
+	The use of "Optional" Arguments, not common mistakes but always set Optional
+	arguments a default value rather than checking it existence.
+
+		Function GetSum(lngFirst As Long, Optional lngSecond As Long) As Long
+			If IsMissing(lngSecond) Then _
+				GetSum = lngFirst _
+			Else _
+				GetSum = lngFirst + lngSecond
+		End Funtion
+
+	Theres nothing wrong in the above declarations of the Arguments, but the use of
+	IsMissing VB Funtion is just a redundancy of what "=" means in Argument 
+	declarations, as Optional, you can actually set a default value for it, look:
+
+		Function GetSum(lngFirst As Long, Optional lngSecond As Long = 0) As Long
+			GetSum = lngFirst + lngSecond
+		End Funtion
+
+3] Arguments Re-using
+
+	Next to Optional is the use of Arguments as a Variables inside functions/subs
+	rather than declaring additional variables, ie, if the argument is not used
+	inside the logic of the functions, like a boolean:
+
+	Offcourse, you must set the argument as Variant type
+
+		Sub ShowMeTheMoney(MoneyWander As Variant)
+			If MoneyWander Then
+				' On this part, MoneyWander variable is already
+				' been done on using, so we re-use it for a	
+				' loop, since it is a Variant type =)
+				For MoneyWander = 0 to 100
+					DoEvents
+				Next
+			End If
+		End Sub
+
+	There's another saved resource!
+
+
+4] ByRef or ByVal
+
+	Yes there are lots who misuse this Argument Option of Using Referenced
+	Variable instead of Actual Passing of Data on a Funtion then Returns
+	the same data after being processed, look at this function that will
+	convert an entire String to a Sentence Case:
+
+		Function SentenceCase(strSentence As String) As String
+			Dim i As Long
+			Dim aryWordz
+    
+			aryWordz = Split(strSentence, " ")
+    
+			For i = LBound(aryWordz) To UBound(aryWordz)
+				aryWordz(i) = UCase(Left(Trim(aryWordz(i)), 1)) & _
+					      LCase(Right(Trim(aryWordz(i)), _
+					      Len(Trim(aryWordz(i))) - 1))
+			Next
+			SentenceCase = Join(aryWordz, " ")
+		End Function
+
+	If you're intention is to modify the variable itself and not passing a direct
+	argument, then modifying this function to a ByRef Argument passed Sub-routine,
+	like this:
+
+
+		Sub SentenceCase(ByRef strSentence As String) As String
+			Dim i As Long
+			Dim aryWordz
+    
+			aryWordz = Split(strSentence, " ")
+    
+			For i = LBound(aryWordz) To UBound(aryWordz)
+				aryWordz(i) = UCase(Left(Trim(aryWordz(i)), 1)) & _
+					      LCase(Right(Trim(aryWordz(i)), _
+					      Len(Trim(aryWordz(i))) - 1))
+			Next
+		End Sub
+
+	The only modifications that have done is, changed the argument from ByVal
+	default to a ByRef Argument, meaning, an Argument needs a Variable to be
+	passed and modifications will be returned, while ByVal only creates a copy
+	of the passed argument. therefore the instruction:
+
+		Dim strMyName As String * 10
+
+		strMyName = "chris vega"
+
+		' and calling to
+
+		strMyName = SentenceCase(strMyName)	' Function Type
+
+		' can be replaced by
+
+		SentenceCase strName			' Sub Type
+
+		MsgBox strMyName			' "Chris Vega"
+
+	Both works fine, regardless of how we should use them, for direct approach
+	i go for Function Type without ByRef Argument, while i go for Sub Type if
+	the algo was used for quick data manipulations like Word-Processings.
+
+5] The Use of Bit-Set Argument Instead of scaled Array of Boolean
+
+	There are lots of options, all can exist and not only one can be selected,
+	the idea can be drastically tailored by using a scaled Array, Look:
+
+		Dim aryOptions(1 To 16) As Boolean
+		Dim i As Long
+
+		' Randomizely Select a TRUE/FALSE Value
+		Randomize
+		For i = 1 to 16
+			aryOptions = (Int(Rnd * 2) = 1)
+		Next
+
+		' A Function like this one can be handy to learn if an Indexed by
+		' a pointer is True or False
+
+		Function CategoryOn(lngPointer As Long) As Boolean
+			CategoryOn = aryOptions(lngPointer)
+		End Funtion
+
+		' So to check if the Value on the 3rd Element is TRUE, then use
+
+		If CategoryOn(3) then
+			' Do Something
+		End If
+
+	And the story goes repeated....well, try to look at the famous MsgBox,
+	and observe:
+
+		MsgBox "Hello World, Watermelon!", vbInformation
+		MsgBox "Hello World, Watermelon!", vbExclamation + vbAbortRetryIgnore
+		MsgBox "Hello World, Watermelon!", vbQuestion + vbYesNo
+		MsgBox "Hello World, Watermelon!", vbCritical + vbRetryCancel
+
+	All of which are legal for the second argument, vbInformation, vbExclamation
+	vbQuestion + vbYesNo etch..How do you think Msgbox handles that? a large-scaled
+	Array with OnOff Category parting huge Select Case Statement? I dont think so..
+
+	What is it then, the answer is a Bit-Set Argument, and checking the passed
+	Argument not by an Array of Boolean, but instead a single Long Argument, and as
+	you know it, Any numbers can be converted to a Binary Number, a serries of
+	On/Off or 1/0, got the picture? Offcourse, this Binary is called Bit-Set and
+	composed of True/False Array of Binary Bits, and using it requires knowledge
+	of conversion, so learn it while you can, for the mean time, here i got a Funtion 
+	to do the conversion for you, you can copy and paste it to your Application.
+
+		Public Function CategoryOn(CategoryNumber As Long, _
+					   CategoryPosition As Long) As Boolean
+			Dim i As Long, j As Long
+			j = 1
+			For i = 1 To CategoryPosition - 1
+				j = j * 2
+			Next
+			If CategoryNumber And j Then CategoryOn = True _
+					        Else CategoryOn = False
+		End Function
+
+	Usage,
+
+		Input:  CategoryNumber	 = BitSet
+		        CategoryPosition = Position (Index) to Test
+
+		Output: True/False depending on the Position
+
+	ex.
+
+		If CategoryOn(233, 2) Then
+			' Do Something
+		End If
+
+		' 233 = 11101001
+		'             ^  Second Element is Zero, therefore FALSE
+		' 2 ----------+
+
+	That is how exactly it works, instead of scaled Array, better use a Bitset
+	to save resources and ability to choose solid platform =)
+
+	Ok, i didn't yet answered the Msgbox Part, as you can see,
+
+		vbInformation or vbExclamation + vbAbortRetryIgnore
+
+	are all constants, therefore resembles a solid number (Long) when added,
+	same as the 233 above, and Msgbox checks Bitset for a Valid Options by 
+	running to the Bit-set itself by Loop
+
+		ex.
+
+		' This is only a simulation, not the real thing..
+
+		Dim i As Long
+		Dim Arg As Long
+
+		For i = 1 to 16
+			If CategoryOn(Arg, i) Then
+			Select Case i
+				Case 1
+					' add Question Mark Icon
+				Case 2
+					' add Yes/No Button
+				Case 3
+					' add Critical Icon
+				.
+				.
+				etch...
+				.
+				.
+			End Select
+			End If
+		Next
+
+	Got the picture? If still not clear, try a bit knowledge about Number Systems.
+
+
+Whats Next
+============================================================================
+
+Next part, I will look for common Mistakes with Looping and Branching, How to manage
+large-scale selections using a Right-Approach of conditional statements, see yah
+
+Cheerz
+
+
+Chris Vega [gwapo@models.com]
